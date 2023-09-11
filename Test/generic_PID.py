@@ -4,8 +4,8 @@ import numpy as np
 
 def step_signal():
     step = 0.1
-    range_x = [round(x, 1) for x in np.arange(0, 4 + step, step)]
-    range_y = [0 if n < 1 or (n > 2 and n < 3) else 1 if n <= 2 else 2 for n in np.arange(0, 4 + step, step)]
+    range_x = [round(x, 1) for x in np.arange(0, 40 + step, step)]
+    range_y = [0 if n < 10 else 1 if n <= 20 else  0.8 if (n > 20 and n < 30) else 2 for n in np.arange(0, 40 + step, step)]
     print(range_y)
     return range_x, range_y
 
@@ -24,8 +24,8 @@ class PIDController:
         self._last_t: int = t_0
         
         self._Ts = Ts
-        self._umax = 3
-        self._umin = -1
+        self._umax = 5
+        self._umin = -5
 
     def _limits( self, value:float, max:int, min:int ) -> float:
         return max if value > 1 else min if value < 0 else value
@@ -34,13 +34,12 @@ class PIDController:
         
         self._e = target - state
         up = self._kp * self._e
-        print(self._e)
         
         ui = self._Ts * 0.5 * (self._last_error[0] - self._e)
         if self._accumulated_error >= self._umax or self._accumulated_error <= self._umin:
             ui = 0
             
-        ud = ( self._Ts * ( self._last_error[0] - self._e ) ) * 0.5 * self._kd
+        ud = ((self._e - self._last_error[0]) / self._Ts) * self._kd
          
         self._u = self._accumulated_error + up + ui + ud
         
@@ -63,8 +62,8 @@ if __name__ == "__main__":
 
     # PID gains
     kp = 1
-    ki = 0.5
-    kd = 0.1
+    ki = 0.8
+    kd = 0.5
 
     # Create a PID controller
     pid = PIDController( kp, ki, kd, 0, 0.1 )
@@ -92,12 +91,9 @@ if __name__ == "__main__":
 
         _, responce, _ = signal.lsim(system, PID_controll_value[:index + 1], time[:index+1], X0=0)
         
-        print(responce)
         if str(responce) == "0.0":
             position = 0
         else:
-            print(len(time))
-            print(len(list(responce)))
             position = list(responce)[-1]
 
         P.append(p)
@@ -110,9 +106,9 @@ if __name__ == "__main__":
         
     plt.plot(time, pid_output, label="Process Value", color='orange')
     plt.plot(time, list(values), linestyle='--', label="Setpoint", color='red')
-    plt.plot(time, P)
-    plt.plot(time, I)
-    plt.plot(time, D)
+    #plt.plot(time, P)
+    #plt.plot(time, I)
+    #plt.plot(time, D)
     plt.xlabel("Time Steps")
     plt.legend(["SImulated value", "Target", "P", 'I', "D"])
     plt.show()
