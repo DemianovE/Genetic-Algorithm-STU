@@ -8,7 +8,7 @@ import scipy.signal as signal
 import numpy as np
 
 NUM_OF_POP = 20
-GENERATIONS = 200
+GENERATIONS = 100
 POP_SIZE = 160
 
 POP_MIN = 0
@@ -84,11 +84,17 @@ def save( data, data2 ):
         
     with open(f'{FILE_PATH}fit_{NOW}.json', 'w') as f:
         json.dump( np.array( data2 ).tolist(), f)
-        
+    with open(f'{FILE_PATH}fit_last.json', 'w') as f:
+        json.dump( np.array( data2 ).tolist(), f)
+    
 def open_json():
     with open(f'{FILE_PATH}pop_last.json', 'r') as json_file:
         data = json.load(json_file)
-    return data
+        
+    with open(f'{FILE_PATH}fit_last.json', 'r') as json_file:
+        fit = json.load(json_file)
+    index = np.argmin(fit)
+    return [data[index].copy() for _ in range(len(data))]
 
 def plot_plt( values, best ):
     
@@ -118,12 +124,13 @@ if __name__ == "__main__":
         
         fit, values_plt = fit_funk( pop, nn )
         best_overall.append(min(fit))
+        print(f'Averange - {sum(fit)/ len(fit)}')
         
         index_min = np.argmin(fit)
         
-        best = select.worst( pop, score = fit, num_of_points = [1, 1, 1] )
+        best = select.worst( pop, score = fit, num_of_points = [2, 2] )
         
-        rest_1 = select.worst( pop, score = fit, num_of_points = [4, 4, 3, 2, 2 ] )
+        rest_1 = select.worst( pop, score = fit, num_of_points = [6, 5, 3 ] )
         rest_2 = select.random( pop, 2 )
         
         rest_1 = crossover.point_crossover( rest_1, [ 10, 80, 140 ] )
