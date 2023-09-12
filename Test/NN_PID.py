@@ -8,7 +8,7 @@ import scipy.signal as signal
 import numpy as np
 
 NUM_OF_POP = 20
-GENERATIONS = 100
+GENERATIONS = 200
 POP_SIZE = 160
 
 POP_MIN = 0
@@ -17,6 +17,9 @@ POP_MAX = 1
 ENDS_HL = [0, 130]
 ENDS_BEAS = [130, 150]
 ENDS_OUT = [150, 160]
+
+OFF_FILE = True
+FILE_PATH = "OUTPUT/"
 
 NOW = datetime.datetime.now()
 
@@ -73,11 +76,19 @@ def fit_funk( pop, nn ):
     return result, full_pid
 
 def save( data, data2 ):
-    with open(f'pop_{NOW}.json', 'w') as f:
+    with open(f'{FILE_PATH}pop_{NOW}.json', 'w') as f:
         json.dump( np.array( data ).tolist(), f)
         
-    with open(f'fit_{NOW}.json', 'w') as f:
+    with open(f'{FILE_PATH}pop_last.json', 'w') as f:
+        json.dump( np.array( data ).tolist(), f)
+        
+    with open(f'{FILE_PATH}fit_{NOW}.json', 'w') as f:
         json.dump( np.array( data2 ).tolist(), f)
+        
+def open_json():
+    with open(f'{FILE_PATH}pop_last.json', 'r') as json_file:
+        data = json.load(json_file)
+    return data
 
 def plot_plt( values, best ):
     
@@ -88,14 +99,17 @@ def plot_plt( values, best ):
     for pl in values:
         plt.plot(time, pl, linestyle='--', color='orange')
         
-    plt.plot(time, best, linestyle='--', color='red')
+    plt.plot(time, best, color='red')
     plt.plot(time, signal, label="Setpoint", color='black')
     plt.show()
 
 if __name__ == "__main__":
     nn = NN( inp, out, hl )
 
-    pop = [[random.uniform(POP_MIN, POP_MAX) for _ in range( POP_SIZE )] for _ in range(NUM_OF_POP)]
+    if OFF_FILE == False:
+        pop = [[random.uniform(POP_MIN, POP_MAX) for _ in range( POP_SIZE )] for _ in range(NUM_OF_POP)]
+    else:
+        pop = open_json()
     best_overall = []
 
     for _ in range( GENERATIONS ):
@@ -109,8 +123,8 @@ if __name__ == "__main__":
         
         best = select.worst( pop, score = fit, num_of_points = [1, 1, 1] )
         
-        rest_1 = select.worst( pop, score = fit, num_of_points = [3, 3, 2, 2, 2 ] )
-        rest_2 = select.random( pop, 5 )
+        rest_1 = select.worst( pop, score = fit, num_of_points = [4, 4, 3, 2, 2 ] )
+        rest_2 = select.random( pop, 2 )
         
         rest_1 = crossover.point_crossover( rest_1, [ 10, 80, 140 ] )
         rest_2 = crossover.point_crossover( rest_2, [ 30, 100, 130 ] )
