@@ -2,7 +2,7 @@ import sys
 sys.path.append('Toollbox/')
 
 
-from Toollbox.init import *
+from init import *
 import matplotlib.pyplot as plt 
 NUM_OF_POP = 100
 GENERATIONS = 10000

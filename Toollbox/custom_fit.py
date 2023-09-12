@@ -34,4 +34,3 @@ def _scale_values(original_list):
     
     
     return scaled_list
-

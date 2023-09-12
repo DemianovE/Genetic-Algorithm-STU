@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # PID gains
     kp = 1
     ki = 0.8
-    kd = 0.5
+    kd = 0.05
 
     # Create a PID controller
     pid = PIDController( kp, ki, kd, 0, 0.1 )
@@ -106,9 +106,9 @@ if __name__ == "__main__":
         
     plt.plot(time, pid_output, label="Process Value", color='orange')
     plt.plot(time, list(values), linestyle='--', label="Setpoint", color='red')
-    #plt.plot(time, P)
-    #plt.plot(time, I)
-    #plt.plot(time, D)
+    plt.plot(time, P)
+    plt.plot(time, I)
+    plt.plot(time, D)
     plt.xlabel("Time Steps")
     plt.legend(["SImulated value", "Target", "P", 'I', "D"])
     plt.show()

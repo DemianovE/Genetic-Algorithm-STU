@@ -2,20 +2,23 @@
 # All classes are imported seperately, the functions should be accessable only through type.
 
 ### GA Population ###
-from Toollbox.population import Population
+from population import Population
 
 
 ### Crossover functions ###
-import Toollbox.crossover as crossover
+import crossover as crossover
 
 ### Mutation functions ###
-import Toollbox.mutations as mutations
+import mutations
 
 ### Selection functions ###
-import Toollbox.select as select
+import select_all as select
 
 ### Custom fit functions ###
-import Toollbox.custom_fit as custom_fit
+import custom_fit
+
+from NN import NN
+from PID import PIDController
 
 ### Libs ###
 import numpy as np
