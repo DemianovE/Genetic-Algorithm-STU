@@ -5,7 +5,9 @@ import numpy as np
 def step_signal():
     step = 0.1
     range_x = [round(x, 1) for x in np.arange(0, 40 + step, step)]
-    range_y = [0 if n < 10 else 1 if n <= 20 else  0.8 if (n > 20 and n < 30) else 2 for n in np.arange(0, 40 + step, step)]
+    #range_y = [0 if n < 30 or ( n >= 100 and n < 160) or n >= 220 else 1 for n in np.arange(0, 300 + step, step)]
+    #range_y = [0 if n < 20 else 0.5 if n <= 60 else  0.8 if (n > 60 and n < 120) else 0.4 for n in np.arange(0, 200 + step, step)]
+    range_y = [0 if n < 5 or ( n >= 10 and n < 15 ) else 10 if (n >= 5 and n < 10) or (n >= 30 and n < 35) else 5 if (n >= 25 and n < 30) else 25 if (n >= 35) else 30 if (n>= 15 and n<20) else 35  for n in np.arange(0, 40 + step, step)]
     print(range_y)
     return range_x, range_y
 
@@ -24,8 +26,8 @@ class PIDController:
         self._last_t: int = t_0
         
         self._Ts = Ts
-        self._umax = 5
-        self._umin = -5
+        self._umax = 40
+        self._umin = -40
 
     def _limits( self, value:float, max:int, min:int ) -> float:
         return max if value > 1 else min if value < 0 else value

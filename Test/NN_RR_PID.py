@@ -10,7 +10,7 @@ import time
 
 NUM_OF_POP = 20
 GENERATIONS = 200
-POP_SIZE = 160
+POP_SIZE = 180
 
 POP_MIN = 0
 POP_MAX = 1
@@ -18,8 +18,9 @@ POP_MAX = 1
 ENDS_HL = [0, 130]
 ENDS_BEAS = [130, 150]
 ENDS_OUT = [150, 160]
+ENDS_RR = [160, 180]
 
-OFF_FILE = True
+OFF_FILE = False
 FILE_PATH = "OUTPUT/"
 
 NOW = datetime.datetime.now()
@@ -48,6 +49,7 @@ def fit_funk( pop, nn ):
         nn.fill_hl( one[ ENDS_HL[0]: ENDS_HL[1] ] )
         nn.fill_beas( one[ ENDS_BEAS[0]: ENDS_BEAS[1] ] )
         nn.fill_output( one[ ENDS_OUT[0]: ENDS_OUT[1] ] )
+        nn.fill_rr( one[ ENDS_RR[0]: ENDS_RR[1] ] )
         
         system = signal.TransferFunction([1], [1, 2, 1])
         time_signal, values = step_signal()
@@ -66,7 +68,7 @@ def fit_funk( pop, nn ):
             last_error = value - position
             whole_error += abs(last_error)
             
-            cv = nn.calculate( [ target, last_error, position])
+            cv = nn.calculate_rr( [ target, last_error, position])
             
             PID_controll_value.append(cv)
             _, responce, _ = signal.lsim(system, PID_controll_value[:index + 1], time_signal[:index+1], X0=0)
@@ -82,24 +84,24 @@ def fit_funk( pop, nn ):
     return result, full_pid
 
 def save( data, data2, data3 ):
-    with open(f'{FILE_PATH}pop_{NOW}.json', 'w') as f:
+    with open(f'{FILE_PATH}pop_{NOW}_rr.json', 'w') as f:
         json.dump( np.array( data ).tolist(), f)
         
-    with open(f'{FILE_PATH}pop_last.json', 'w') as f:
+    with open(f'{FILE_PATH}pop_last_rr.json', 'w') as f:
         json.dump( np.array( data ).tolist(), f)
         
-    with open(f'{FILE_PATH}fit_{NOW}.json', 'w') as f:
+    with open(f'{FILE_PATH}fit_{NOW}_rr.json', 'w') as f:
         json.dump( np.array( data2 ).tolist(), f)
-    with open(f'{FILE_PATH}fit_last.json', 'w') as f:
+    with open(f'{FILE_PATH}fit_last_rr.json', 'w') as f:
         json.dump( np.array( data2 ).tolist(), f)
-    with open(f'{FILE_PATH}success_{NOW}.json', 'w') as f:
+    with open(f'{FILE_PATH}success_{NOW}_rr.json', 'w') as f:
         json.dump( np.array( data3 ).tolist(), f)
     
 def open_json():
-    with open(f'{FILE_PATH}pop_last.json', 'r') as json_file:
+    with open(f'{FILE_PATH}pop_last_rr.json', 'r') as json_file:
         data = json.load(json_file)
         
-    with open(f'{FILE_PATH}fit_last.json', 'r') as json_file:
+    with open(f'{FILE_PATH}fit_last_rr.json', 'r') as json_file:
         fit = json.load(json_file)
     index = np.argmin(fit)
     return [data[index].copy() for _ in range(NUM_OF_POP)]
@@ -142,10 +144,10 @@ if __name__ == "__main__":
         print(f'Averange - {sum(fit)/ len(fit)}')
         index_min = np.argmin(fit)
         
-        best = select.worst( pop, score = fit, num_of_points = [2, 2] )
+        best = select.worst( pop, score = fit, num_of_points = [2] )
         
-        rest_1 = select.worst( pop, score = fit, num_of_points = [7, 5] )
-        rest_2 = select.random( pop, 4 )
+        rest_1 = select.worst( pop, score = fit, num_of_points = [7, 4] )
+        rest_2 = select.random( pop, 7 )
         
         rest_1 = crossover.point_crossover( rest_1, [ 10, 80, 140 ] )
         rest_2 = crossover.point_crossover( rest_2, [ 30, 100, 130 ] )
