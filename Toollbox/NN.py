@@ -76,7 +76,9 @@ class NN:
         return self._min_max_scaling( value )
     
     def _tang( self, x ):
-        value = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+
+        x = round(x, 4)
+        value = np.tanh(5 * x)
         return self._min_max_scaling( value )
     
     def _chose_af( self, x, af):
